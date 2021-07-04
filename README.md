@@ -7,4 +7,4 @@ The `Docs` directory contains the reverse engineered protocol description, the S
 
 This is the actual remote:
 
-<img src="/RobThree/SAC12010QC/raw/main/Photos/remote_front_closed.jpeg" alt="SAC12010QC remote control" style="max-width:50%;">
+<img src="/RobThree/SAC12010QC/blob/main/Photos/remote_front_closed.jpeg" alt="SAC12010QC remote control" style="max-width:50%;">
