@@ -13,7 +13,7 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
         </tr>
         <tr>
           <td>Function</td>
-          <td><code>HGGFEEEE0DCCBAAA</code></td>
+          <td><code>JHHGFFFFEDCCBAAA</code></td>
         </tr>
       </table>
     </td>
@@ -130,19 +130,34 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
           </td>
         </tr>
         <tr valign="top">
-          <td>0</td>
+          <td>E</td>
           <td>7</td>
-          <td>Zero</td>
-          <td>Always <code>0</code></td>
+          <td>Sleep</td>
+          <td>
+            <table>
+              <tr>
+                <th>Value</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td><code>0</code></td>
+                <td>Off</td>
+              </tr>
+              <tr>
+                <td><code>1</code></td>
+                <td>On</td>
+              </tr>
+            </table>
+          </td>
         </tr>
         <tr valign="top">
-          <td>E</td>
+          <td>F</td>
           <td>8 to 11</td>
           <td>Temperature</td>
           <td>Offset from 16°C, ranging from 16°C (<code>0000</code>) to 30°C (<code>1110</code>)</td>
         </tr>
         <tr valign="top">
-          <td>F, G, H</td>
+          <td>G, H, J</td>
           <td>12 to 15</td>
           <td>Timer</td>
           <td>See <a href="#timer">Timer</a></td>
@@ -269,23 +284,23 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
 </table>
 
 ## Timer
-The timer on/off state is indicated by address bit `15` (`H`, or the address' MSB). Bit `12` (`F`) is the half hour indicator. Bits `13` and `14` (`G`) of the address are the tens position of the 24 hour clock and bits `0` to `3` of the command (`Z`) are the ones position of the 24 hour clock (essentially [BCD encoding](https://en.wikipedia.org/wiki/Binary-coded_decimal) the time). The time is calculated by composing the `GGZZZZF` bits where `G` is the 'tens' part, `Z` is the 'ones' part and `F` is the half-hour indicator (`0` being 0, `1` being ½ an hour).
+The timer on/off state is indicated by address bit `15` (`J`, or the address' MSB). Bit `12` (`G`) is the half hour indicator. Bits `13` and `14` (`H`) of the address are the tens position of the 24 hour clock and bits `0` to `3` of the command (`Z`) are the ones position of the 24 hour clock (essentially [BCD encoding](https://en.wikipedia.org/wiki/Binary-coded_decimal) the time). The time is calculated by composing the `HHZZZZG` bits where `H` is the 'tens' part, `Z` is the 'ones' part and `G` is the half-hour indicator (`0` being 0, `1` being ½ an hour).
 
 Let's take the following example:
 
             Address          Command
             1011010001001001 00000111
-    Meaning HGGFEEEE0DCCBAAA VWXYZZZZ
+    Meaning JHHGFFFFEDCCBAAA VWXYZZZZ
 
 Let's mask out the bits we're not interested in:
 
             Address          Command
             1011............ ....0111
-    Meaning HGGF............ ....ZZZZ
+    Meaning JHHG............ ....ZZZZ
 
 This gives us:
 
-    H GG ZZZZ F
+    J HH ZZZZ G
     1 01 0111 1
     | |/ \  / |
     | |   \/  |
