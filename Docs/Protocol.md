@@ -1,6 +1,6 @@
 # Protocol
 
-The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and a ```Command``` which, in total, give us 24 bits. Turns out the IR protocol for the SAC12010QC is as simple as they get. Below tables explain how the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 byte, 8 bits) make up the entire protocol.
+The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and a ```Command``` which, in total, give us 24 bits. Turns out the IR protocol for the SAC9010QC/SAC12010QC is as simple as they get. Below tables explain how the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 byte, 8 bits) make up the entire protocol.
 
 <table>
   <tr><th colspan="2" align="left"><h2>Address</h2></th></tr>
