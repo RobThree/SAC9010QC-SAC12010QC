@@ -238,9 +238,8 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
         <tr valign="top">
           <td>W</td>
           <td>6</td>
-          <td>Christmastree</td>
+          <td>Air ionizer</td>
           <td>
-            No clue what this does, but it shows a 🎄 on the<br>LCD display on the remote.
             <table>
               <tr>
                 <th>Value</th>
