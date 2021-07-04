@@ -77,6 +77,8 @@ void setup() {
     Serial.println(F("START " __FILE__ " from " __DATE__));
     initPCIInterruptForTinyReceiver();
     Serial.println(F("Ready to receive NEC IR signals at pin " STR(IR_INPUT_PIN)));
+
+    Serial.println("Address Command Repeat");
 }
 
 void loop() {
@@ -97,11 +99,10 @@ void handleReceivedTinyIRData(uint16_t aAddress, uint8_t aCommand, bool isRepeat
     /*
      * Print only very short output, since we are in an interrupt context and do not want to miss the next interrupts of the repeats coming soon
      */
-    Serial.print(F("A= "));
     Serial.print(aAddress, BIN);
-    Serial.print(F(" C= "));
+    Serial.print("\t");
     Serial.print(aCommand, BIN);
-    Serial.print(F(" R= "));
-    Serial.print(isRepeat);
+    Serial.print("\t");
+    Serial.print(isRepeat ? "Repeat" : "");
     Serial.println();
 }

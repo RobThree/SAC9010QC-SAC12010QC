@@ -1,6 +1,6 @@
 # Protocol
 
-Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 byte, 8 bits)
+The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and a ```Command``` which, in total, give us 24 bits. Turns out the IR protocol for the SAC12010QC is as simple as they get. No CRC's, no hashes, nothing. Raw bits. Below tables explain how the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 byte, 8 bits) make up the entire protocol.
 
 <table>
   <tr><th colspan="2" align="left"><h2>Address</h2></th></tr>
@@ -13,7 +13,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
         </tr>
         <tr>
           <td>Function</td>
-          <td><code>TTTTTTTT0SFFPMMM</code></td>
+          <td><code>HGGFEEEE0DCCBAAA</code></td>
         </tr>
       </table>
     </td>
@@ -26,7 +26,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           <th>Values</th>
         </tr>
         <tr valign="top">
-          <td>M</td>
+          <td>A</td>
           <td>0, 1 and 2</td>
           <td>Mode</td>
           <td>
@@ -59,7 +59,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           </td>
         </tr>
         <tr valign="top">
-          <td>P</td>
+          <td>B</td>
           <td>3</td>
           <td>Power</td>
           <td>
@@ -80,7 +80,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           </td>
         </tr>
         <tr valign="top">
-          <td>F</td>
+          <td>C</td>
           <td>4, 5</td>
           <td>Fan speed</td>
           <td>
@@ -109,7 +109,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           </td>
         </tr>
         <tr valign="top">
-          <td>S</td>
+          <td>D</td>
           <td>6</td>
           <td>Swing</td>
           <td>
@@ -136,10 +136,16 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           <td>Always <code>0</code></td>
         </tr>
         <tr valign="top">
-          <td>T</td>
-          <td>8 to 15</td>
+          <td>E</td>
+          <td>8 to 11</td>
           <td>Temperature</td>
-          <td>See <a href="#timer-and-temperature">Timer &amp; Temperature</a></td>
+          <td>Offset from 16°C, ranging from 16°C (<code>0000</code>) to 30°C (<code>1110</code>)</td>
+        </tr>
+        <tr valign="top">
+          <td>F, G, H</td>
+          <td>8 to 15</td>
+          <td>Timer</td>
+          <td>See <a href="#timer">Timer</a></td>
         </tr>
       </table>
     </td>
@@ -154,7 +160,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
         </tr>
         <tr>
           <td>Function</td>
-          <td><code>SXLHTTTT</code></td>
+          <td><code>VWXYZZZZ</code></td>
         </tr>
       </table>
     </td>
@@ -167,13 +173,13 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           <th>Values</th>
         </tr>
         <tr valign="top">
-          <td>T</td>
+          <td>Z</td>
           <td>0 to 3</td>
           <td>Timer</td>
-          <td>See <a href="#timer-and-temperature">Timer &amp; Temperature</a></td>
+          <td>See <a href="#timer">Timer</a></td>
         </tr>
         <tr valign="top">
-          <td>H</td>
+          <td>Y</td>
           <td>4</td>
           <td>Humid</td>
           <td>
@@ -194,7 +200,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           </td>
         </tr>
         <tr valign="top">
-          <td>L</td>
+          <td>X</td>
           <td>5</td>
           <td>Light</td>
           <td>
@@ -215,7 +221,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           </td>
         </tr>
         <tr valign="top">
-          <td>X</td>
+          <td>W</td>
           <td>6</td>
           <td>Christmas(?)</td>
           <td>
@@ -236,7 +242,7 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
           </td>
         </tr>
         <tr valign="top">
-          <td>S</td>
+          <td>V</td>
           <td>7</td>
           <td>Save</td>
           <td>
@@ -261,5 +267,29 @@ Below tables explain the ```Address``` (2 bytes, 16 bits) and ```Command``` (1 b
   </tr>
 </table>
 
-## Timer and Temperature
-TODO
+## Timer
+The timer on/off state is indicated by address bit `15` (`H`, or the address' MSB). Bit `12` (`F`) is the half hour indicator. Bits `13` and `14` (`G`) of the address are the tens position of the 24 hour clock and bits `0` to `3` of the command (`Z`) are the ones position of the 24 hour clock (essentially [BCD encoding](https://en.wikipedia.org/wiki/Binary-coded_decimal) the time). The time is calculated by composing the `GGZZZZF` bits where `G` is the 'tens' part, `Z` is the 'ones' part and `F` is the half-hour indicator (`0` being 0, `1` being ½ an hour).
+
+Let's take the following example:
+
+            Address          Command
+            1011010001001001 00000111
+    Meaning HGGFEEEE0DCCBAAA VWXYZZZZ
+
+Let's mask out the bits we're not interested in:
+
+            Address          Command
+            1011............ ....0111
+    Meaning HGGF............ ....ZZZZ
+
+This gives us:
+
+    H GG ZZZZ F
+    1 01 0111 1
+    | |/ \  / |
+    | |   \/  |
+    | 1   7   ½
+    |
+    Timer on (1)
+
+Or: 17.5 hours.
