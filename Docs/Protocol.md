@@ -154,7 +154,7 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
           <td>F</td>
           <td>8 to 11</td>
           <td>Temperature</td>
-          <td>Offset from 16°C, ranging from 16°C (<code>0000</code>) to 30°C (<code>1110</code>)</td>
+          <td>Offset from 16°C, ranging from<br>16°C (<code>0000</code>) to 30°C (<code>1110</code>)</td>
         </tr>
         <tr valign="top">
           <td>G, H, J</td>
@@ -240,7 +240,7 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
           <td>6</td>
           <td>Christmastree</td>
           <td>
-            No clue what this does, but it shows a 🎄 on the LCD display on the remote.
+            No clue what this does, but it shows a 🎄 on the<br>LCD display on the remote.
             <table>
               <tr>
                 <th>Value</th>
