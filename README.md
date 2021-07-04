@@ -8,3 +8,5 @@ The `Docs` directory contains the reverse engineered protocol description, the S
 This is the actual remote:
 
 <img src="https://github.com/RobThree/SAC12010QC/blob/main/Photos/remote_front_closed.jpeg?raw=true" alt="SAC12010QC remote control" width="250">
+
+It is [apparently](https://www.aliexpress.com/wholesale?SearchText=Gree+Y512) also known as the "Gree Y502 / Y512" remote.
