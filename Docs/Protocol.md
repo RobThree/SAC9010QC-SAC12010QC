@@ -143,7 +143,7 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
         </tr>
         <tr valign="top">
           <td>F, G, H</td>
-          <td>8 to 15</td>
+          <td>12 to 15</td>
           <td>Timer</td>
           <td>See <a href="#timer">Timer</a></td>
         </tr>
@@ -223,8 +223,9 @@ The [IRMP library](https://github.com/ukw100/IRMP) gives us an ```Address``` and
         <tr valign="top">
           <td>W</td>
           <td>6</td>
-          <td>Christmas(?)</td>
+          <td>Christmastree</td>
           <td>
+            No clue what this does, but it shows a 🎄 on the LCD display on the remote.
             <table>
               <tr>
                 <th>Value</th>

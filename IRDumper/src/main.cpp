@@ -78,7 +78,7 @@ void setup() {
     initPCIInterruptForTinyReceiver();
     Serial.println(F("Ready to receive NEC IR signals at pin " STR(IR_INPUT_PIN)));
 
-    Serial.println("Address Command Repeat");
+    Serial.println("Address\tCommand\tRepeat");
 }
 
 void loop() {
