@@ -1,5 +1,5 @@
 # Reverse engineered SAC12010QC IR protocol
-Reverse engineered IR protocol for Home Living / Alaska SAC12010QC remote control based on an NEC 756504012 IC.
+Reverse engineered IR protocol for HomeFit Living / Alaska SAC12010QC remote control based on an NEC 756504012 IC.
 
 If you want to go straight to the juicy parts, go checkout [Docs/Protocol.md](Docs/Protocol.md).
 
