@@ -116,9 +116,12 @@ int main()
     state.Ionizer = false;
     state.Save = false;
     
+    // Test creating a frame
     Frame f = CreateFrame(state);
     printf("A\t");PrintFrame(f);
 
+    // Parse the frame back to a state, and (re)create a frame so we can
+    // confirm no values get lost in a roundtrip
     HVACState s = ParseFrame(f);
     printf("B\t");PrintFrame(CreateFrame(s));
 }
