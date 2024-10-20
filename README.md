@@ -1,5 +1,5 @@
 # Reverse engineered SAC9010QC/SAC12010QC IR protocol
-Reverse engineered IR protocol for HomeFit Living / Alaska SAC9010QC/SAC12010QC remote control based on an NEC 756504012 IC.
+Reverse engineered IR protocol for HomeFit Living / Alaska SAC9010QC/SAC12010QC remote control based on an NEC 756504012 IC. It is [apparently](https://www.aliexpress.com/wholesale?SearchText=Gree+Y512) also known as the "Gree Y502 / Y512" remote and the silkscreen on the PCB states "Gree 5I2".
 
 If you want to go straight to the juicy parts, go checkout [Docs/Protocol.md](Docs/Protocol.md).
 
@@ -8,5 +8,3 @@ The `Docs` directory contains the reverse engineered protocol description, the S
 This is the actual remote:
 
 <img src="https://github.com/RobThree/SAC12010QC/blob/main/Photos/remote_front_closed.jpeg?raw=true" alt="SAC12010QC remote control" width="250">
-
-It is [apparently](https://www.aliexpress.com/wholesale?SearchText=Gree+Y512) also known as the "Gree Y502 / Y512" remote.
