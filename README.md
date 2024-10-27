@@ -1,9 +1,29 @@
 # Reverse engineered `SAC9010QC` / `SAC12010QC` IR protocol
 Reverse engineered IR protocol for HomeFit Living / Alaska `SAC9010QC` / `SAC12010QC` remote control based on an `NEC 756504012` IC. It is [apparently](https://www.aliexpress.com/wholesale?SearchText=Gree+Y512) also known as the "`Gree Y502 / Y512`" remote and the silkscreen on the PCB states "`Gree 5I2`".
 
-If you want to go straight to the juicy parts, go checkout [Docs/Protocol.md](Docs/Protocol.md).
+If you want to go straight to the juicy parts, go checkout [protocol.md](protocol.md).
 
-The `Docs` directory contains the reverse engineered protocol description, the `SAC9010QC` / `SAC12010QC` manual and other resources used. In the `IRDumper` directory you'll find a quick'n'dirty tool I used to dump the binary values the remote sends to the AC unit. I put this all in a [spreadsheet](https://docs.google.com/spreadsheets/d/1pSQ7pgmrUBQDSEJBGOqifYe8MEUH_zT2gXGCYaq8Yak/edit?usp=sharing) and used that to 'decipher' the protocol. The `Photos` directory contains some photos of the remote control, it's PCB and my test setup. `SignalDumps` contains a few dumps of the IR signal as captured by [my oscilloscope](https://www.aliexpress.com/item/4000768225718.html).
+The [documentation](documentation) directory contains the `SAC9010QC` / `SAC12010QC` manual and other resources used. The [pics](pics) directory contains some photos of the remote control, it's PCB and my test setup. [dumps](dumps) contains a few [PulseView](https://sigrok.org/wiki/PulseView) dumps of the IR signal as captured by my [DSLogic Plus](https://nl.aliexpress.com/item/33023055743.html).
+
+Finally, [src](src) contains a simple webserver that can be used to control the AC unit by using a REST protocol. It uses the WiFiManager for initial WiFi setup (connect to it's accesspoint, enter your WiFi SSID and password) and after that you can go to it's IP and do a `GET` on `/state` to get the current state (as managed by the ESP, not the *actual* state of the AC unit, since that cannot be read). The response will look like:
+
+```json
+{
+	"power": false,
+	"temperature": 20,
+	"fanspeed": 0,
+	"mode": "COOL",
+	"swing": false,
+	"sleep": false,
+	"humid": false,
+	"light": false,
+	"ionizer": false,
+	"save": false,
+	"timer": 0  // Number of half-hour increments (0..47)
+}
+```
+
+The same JSON can be used to send a new state to the AC unit. Use the same `/state` endpoint and use the `PUT` method. The modes are: `AUTO`, `COOL`, `DEHUMIDIFY`, `FAN` and `HEAT` and are case-insensitive. Fanspeed `0` is `Auto` and can be `0` to `3`. Temperature can range from `16` to `30`. The timer is specified in half-hour increments and can range from `0` to `47` (23.5 hours). So if you want to set a timer for 13.5 hours use the value `27` (`13.5hr / 0.5hr increments = 27`). The `air1` and `air2` values (see [protocol](protocol.md), bits 24 and 25) are currently not exposed over REST.
 
 This is the actual remote:
 

@@ -1,2 +1,0 @@
-# IRDumper
-Quick 'n' dirty tool to dump IR protocol with an [Arduino Uno](https://store.arduino.cc/arduino-uno-rev3) and a simple [IR module](https://aliexpress.com/item/4001116679683.html) hooked up to pin `2` of the Arduino Uno. Uses the excellent [IRMP](https://github.com/ukw100/IRMP).
