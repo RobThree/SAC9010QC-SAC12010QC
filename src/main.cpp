@@ -106,6 +106,13 @@ String getStateAsJson()
     return output;
 }
 
+void blastIR() {
+    uint64_t irCommand = getIRCommand();
+    Serial.print("Sending IR: ");
+    Serial.println(irCommand, BIN);
+    irsend.sendTeco(irCommand, 36);
+}
+
 void setup() {
   irsend.begin();
 
@@ -161,13 +168,7 @@ void setup() {
       }
 
       server.send(200, "text/plain", getStateAsJson());
-
-      uint64_t irCommand = getIRCommand();
-      Serial.print("Sending IR: ");
-      Serial.println(irCommand, BIN);
-      irsend.sendTeco(irCommand, 36);
-
-      delay(200);
+      blastIR();
     }
   });
 
@@ -188,6 +189,7 @@ void setup() {
     server.send(404, "text/plain", "File not found");
   });
 
+  blastIR();      // Initialize AC to our state
   server.begin();
 }
 
