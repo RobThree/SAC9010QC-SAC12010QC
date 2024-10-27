@@ -85,6 +85,27 @@ acMode stringToAcMode(const char* modeStr)
     return AUTO;
 }
 
+String getStateAsJson()
+{
+    JsonDocument root;
+
+    root["power"] = acState.powerOn;
+    root["temperature"] = acState.temperature;
+    root["fanspeed"] = acState.fanspeed;
+    root["mode"] = acModeToString(acState.mode);
+    root["swing"] = acState.swing;
+    root["sleep"] = acState.sleep;
+    root["humid"] = acState.humid;
+    root["light"] = acState.light;
+    root["ionizer"] = acState.ionizer;
+    root["save"] = acState.save;
+    root["timer"] = acState.timer;  // Number of 30 minute increments (0 .. 47)
+
+    String output;
+    serializeJson(root, output);
+    return output;
+}
+
 void setup() {
   irsend.begin();
 
@@ -139,9 +160,7 @@ void setup() {
         acState.timer = constrain(root["timer"], 0, 47);
       }
 
-      String output;
-      serializeJson(root, output);
-      server.send(200, "text/plain", output);
+      server.send(200, "text/plain", getStateAsJson());
 
       uint64_t irCommand = getIRCommand();
       Serial.print("Sending IR: ");
@@ -154,23 +173,7 @@ void setup() {
 
   server.on("/state", HTTP_GET, []() {
     Serial.println("GET /state");
-    JsonDocument root;
-
-    root["power"] = acState.powerOn;
-    root["temperature"] = acState.temperature;
-    root["fanspeed"] = acState.fanspeed;
-    root["mode"] = acModeToString(acState.mode);
-    root["swing"] = acState.swing;
-    root["sleep"] = acState.sleep;
-    root["humid"] = acState.humid;
-    root["light"] = acState.light;
-    root["ionizer"] = acState.ionizer;
-    root["save"] = acState.save;
-    root["timer"] = acState.timer;  // Number of 30 minute increments (0 .. 47)
-
-    String output;
-    serializeJson(root, output);
-    server.send(200, "text/plain", output);
+    server.send(200, "text/plain", getStateAsJson());
   });
 
 
