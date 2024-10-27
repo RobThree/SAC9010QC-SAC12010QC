@@ -136,7 +136,7 @@ void setup() {
         acState.save = root["save"];
       }
       if (root["timer"].is<int>()) {
-        acState.timer = root["timer"];
+        acState.timer = constrain(root["timer"], 0, 47);
       }
 
       String output;

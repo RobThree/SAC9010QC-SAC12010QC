@@ -19,7 +19,7 @@ Finally, [src](src) contains a simple webserver that can be used to control the 
 	"light": false,
 	"ionizer": false,
 	"save": false,
-	"timer": 0  // Number of half-hour increments (0..47)
+	"timer": 0
 }
 ```
 
@@ -27,4 +27,4 @@ The same JSON can be used to send a new state to the AC unit. Use the same `/sta
 
 This is the actual remote:
 
-<img src="https://github.com/RobThree/SAC12010QC/blob/main/Photos/remote_front_closed.jpeg?raw=true" alt="SAC12010QC remote control" width="250">
+<img src="https://github.com/RobThree/SAC12010QC/blob/main/pics/remote_front_closed.jpg?raw=true" alt="SAC12010QC remote control" width="250">
