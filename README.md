@@ -23,7 +23,7 @@ Finally, [src](src) contains a simple webserver that can be used to control the 
 }
 ```
 
-The same JSON can be used to send a new state to the AC unit. Use the same `/state` endpoint and use the `PUT` method. The modes are: `AUTO`, `COOL`, `DEHUMIDIFY`, `FAN` and `HEAT` and are case-insensitive. Fanspeed `0` is `Auto` and can be `0` to `3`. Temperature can range from `16` to `30`. The timer is specified in half-hour increments and can range from `0` to `47` (23.5 hours). So if you want to set a timer for 13.5 hours use the value `27` (`13.5hr / 0.5hr increments = 27`). The `air1` and `air2` values (see [protocol](protocol.md), bits 24 and 25) are currently not exposed over REST. The webserver uses [IRremoteESP8266](https://github.com/crankyoldgit/IRremoteESP8266) for sending the IR commands (using the [Teco](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/SupportedProtocols.md) protocol).
+The same JSON can be used to send a new state to the AC unit. Use the same `/state` endpoint and use the `PUT` method. The modes are: `AUTO`, `COOL`, `DEHUMIDIFY`, `FAN` and `HEAT` and are case-insensitive. Fanspeed `0` is `Auto` and can be `0` to `3`. Temperature can range from `16` to `30`. The timer is specified in half-hour increments and can range from `0` to `48` (24 hours). So if you want to set a timer for 13.5 hours use the value `27` (`13.5hr / 0.5hr increments = 27`). The `air1` and `air2` values (see [protocol](protocol.md), bits 24 and 25) are currently not exposed over REST. The webserver uses [IRremoteESP8266](https://github.com/crankyoldgit/IRremoteESP8266) for sending the IR commands (using the [Teco](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/SupportedProtocols.md) protocol).
 
 This is the actual remote:
 

@@ -51,10 +51,10 @@ inline const uint64_t getIRCommand()
 
   // Calculate timer value
   uint8_t timer = 0b00000000;
-  timer |= acState.timer > 0 ? 0b10000000 : 0;  // On/off bit
-  timer |= acState.timer % 2 == 0 ? 0 : 1;      // Half hour bit
-  timer |= ((acState.timer / 2) % 10) << 1;     // 1s digit
-  timer |= ((acState.timer / 2) / 10) << 5;     // 10s digit
+  timer |= acState.timer > 0 ? 0b1000 : 0;  // On/off bit
+  timer |= acState.timer % 2 == 0 ? 0 : 1;  // Half hour bit
+  timer |= ((acState.timer / 2) % 10) << 4; // 1s digit
+  timer |= ((acState.timer / 2) / 10) << 1; // 10s digit
 
   // Calculate the rest of the state
   v |= acState.mode;
@@ -99,7 +99,7 @@ String getStateAsJson()
     root["light"] = acState.light;
     root["ionizer"] = acState.ionizer;
     root["save"] = acState.save;
-    root["timer"] = acState.timer;  // Number of 30 minute increments (0 .. 47)
+    root["timer"] = acState.timer;  // Number of 30 minute increments (0 .. 48)
 
     String output;
     serializeJson(root, output);
@@ -164,7 +164,7 @@ void setup() {
         acState.save = root["save"];
       }
       if (root["timer"].is<int>()) {
-        acState.timer = constrain(root["timer"], 0, 47);
+        acState.timer = constrain(root["timer"], 0, 48);
       }
 
       server.send(200, "text/plain", getStateAsJson());
