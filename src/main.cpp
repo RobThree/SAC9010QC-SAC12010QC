@@ -177,6 +177,11 @@ void setup() {
     server.send(200, "text/plain", getStateAsJson());
   });
 
+  server.on("/mac", HTTP_GET, []() {
+    Serial.println("GET /mac");
+    
+    server.send(200, "text/plain", WiFi.macAddress());
+  });
 
   server.on("/reset", HTTP_PUT, []() {
     Serial.println("Resetting");
