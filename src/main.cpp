@@ -119,35 +119,6 @@ void blastIR() {
     irsend.sendTeco(irCommand, 36);
 }
 
-void handleFileUpload() {
-    HTTPUpload &upload = server.upload();
-    static File fsUploadFile;
-
-    if (upload.status == UPLOAD_FILE_START) {
-        String filename = upload.filename;
-        if (!filename.startsWith("/")) {
-            filename = "/" + filename;
-        }
-        Serial.print("File Upload: ");
-        Serial.println(filename);
-        fsUploadFile = LittleFS.open(filename, "w");
-    } else if (upload.status == UPLOAD_FILE_WRITE) {
-        if (fsUploadFile) {
-            fsUploadFile.write(upload.buf, upload.currentSize);
-        }
-    } else if (upload.status == UPLOAD_FILE_END) {
-        if (fsUploadFile) {
-            fsUploadFile.close();
-            Serial.print("Upload Size: ");
-            Serial.println(upload.totalSize);
-            server.sendHeader("Location", "/");
-            server.send(303);
-        } else {
-            server.send(500, "text/plain", "Failed to upload file!");
-        }
-    }
-}
-
 void setup() {
     irsend.begin();
 
@@ -226,19 +197,6 @@ void setup() {
         delay(100);
         ESP.restart();
     });
-
-    // Add file upload route with appropriate handlers
-    server.on("/uploadfs", HTTP_GET, []() {
-        String html = "<form method='POST' action='/uploadfs' enctype='multipart/form-data'>";
-        html += "<input type='file' name='upload'>";
-        html += "<input type='submit' value='Upload File'>";
-        html += "</form>";
-        server.send(200, "text/html", html);
-    });
-
-    server.on(
-        "/uploadfs", HTTP_POST, []() { server.send(200, "text/plain", "Upload complete"); },
-        handleFileUpload);
 
     server.on("/", HTTP_GET, []() {
         File file = LittleFS.open("/index.html", "r");
