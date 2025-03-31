@@ -4,21 +4,16 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <HCSR04.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 #include <WiFiManager.h>
 #include <WiFiUdp.h>
 #include <config.h>
 
-float distance = -1;
-unsigned long previousMillis = 0;
-
 IRsend irsend(IRLED);
 
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdateServer;
-UltraSonicDistanceSensor distanceSensor(TRIGGERPIN, ECHOPIN);
 
 enum acMode { AUTO = 0, COOL = 1, DEHUMIDIFY = 2, FAN = 3, HEAT = 4 };
 
@@ -109,13 +104,7 @@ String getStateAsJson() {
     root["ionizer"] = acState.ionizer;
     root["save"] = acState.save;
     root["timer"] = acState.timer; // Number of 30 minute increments (0 .. 48)
-    root["distance"] = distance;
     root["rssi"] = WiFi.RSSI();
-
-    char lastUpdateStr[32];
-    snprintf(lastUpdateStr, sizeof(lastUpdateStr), "%.2f seconds ago",
-             (millis() - previousMillis) / 1000.0);
-    root["lastupdate"] = lastUpdateStr;
 
     String output;
     serializeJson(root, output);
@@ -261,17 +250,6 @@ void loop() {
         } else {
             setStatus("Failed to reconnect to WiFi. Retrying...");
             delay(1000);
-        }
-    }
-
-    unsigned long currentMillis = millis();
-
-    if (currentMillis - previousMillis >= UPDATEINTERVAL) {
-        previousMillis = currentMillis; // Update the last execution time
-
-        float tmpdistance = distanceSensor.measureDistanceCm();
-        if (tmpdistance > 0) {
-            distance = tmpdistance;
         }
     }
 }

@@ -4,8 +4,6 @@
 #define CONFIG_H
 
 #define IRLED               D2
-#define TRIGGERPIN          D7
-#define ECHOPIN             D8
 
 #define DEVICENAME          "AC Remote Control"
 #define OTAPASSWORD         "YOURSECRETHERE"
