@@ -5,16 +5,31 @@
 #include <WiFiUdp.h>
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
+#include <ArduinoOTA.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
+#include <HCSR04.h>
+#include <config.h>
 
-const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-char deviceName[] = "AC Remote Control";
+const uint16_t kIrLed = IRLED;
+const byte triggerPin = TRIGGERPIN;
+const byte echoPin = ECHOPIN;
+
+const char deviceName[] = DEVICENAME;
+const char otaPassword[] = OTAPASSWORD;
+
+const unsigned long portalTimeout = PORTALTIMEOUT;      // seconds
+const unsigned long wifiConnectTimeout = WIFICONNECTTIMEOUT; // seconds
+const uint8_t wifiConnectRetries = WIFICONNECTRETRIES;
+
+float distance = -1;
+unsigned long previousMillis = 0;
 
 IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
 
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdateServer;
+UltraSonicDistanceSensor distanceSensor(triggerPin, echoPin);
 
 enum acMode { 
   AUTO = 0, 
@@ -30,6 +45,16 @@ struct state {
   bool powerOn, swing, sleep, humid, light, ionizer, save;
 };
 state acState;
+
+void setStatus(const String &status) {
+  Serial.println(status);
+}
+
+void restart(const String &status) {
+  setStatus(status);
+  delay(3000);
+  ESP.restart();
+}
 
 inline const char* acModeToString(acMode mode)
 {
@@ -100,7 +125,13 @@ String getStateAsJson()
     root["ionizer"] = acState.ionizer;
     root["save"] = acState.save;
     root["timer"] = acState.timer;  // Number of 30 minute increments (0 .. 48)
-
+    root["distance"] = distance;
+    root["rssi"] = WiFi.RSSI();
+    
+    char lastUpdateStr[32];
+    snprintf(lastUpdateStr, sizeof(lastUpdateStr), "%.2f seconds ago", (millis() - previousMillis) / 1000.0);
+    root["lastupdate"] = lastUpdateStr;
+    
     String output;
     serializeJson(root, output);
     return output;
@@ -116,18 +147,20 @@ void blastIR() {
 void setup() {
   irsend.begin();
 
-  Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
+  Serial.begin(SERIAL_BAUDRATE, SERIAL_8N1, SERIAL_TX_ONLY);
 
   WiFiManager wifiManager;
+  wifiManager.setConfigPortalTimeout(portalTimeout);
+  wifiManager.setConnectTimeout(wifiConnectTimeout);
+  wifiManager.setConnectRetries(wifiConnectRetries);
+  wifiManager.setWiFiAutoReconnect(true);
   if (!wifiManager.autoConnect(deviceName)) {
-    delay(3000);
-    ESP.restart();
-    delay(5000);
+      restart("Autconnect failed...");
   }
 
   httpUpdateServer.setup(&server);
   server.on("/state", HTTP_PUT, []() {
-    Serial.println("PUT /state");
+    setStatus("PUT /state");
     JsonDocument root;
     DeserializationError error = deserializeJson(root, server.arg("plain"));
     if (error) {
@@ -173,18 +206,18 @@ void setup() {
   });
 
   server.on("/state", HTTP_GET, []() {
-    Serial.println("GET /state");
+    setStatus("GET /state");
     server.send(200, "text/plain", getStateAsJson());
   });
 
   server.on("/mac", HTTP_GET, []() {
-    Serial.println("GET /mac");
+    setStatus("GET /mac");
     
     server.send(200, "text/plain", WiFi.macAddress());
   });
 
   server.on("/reset", HTTP_PUT, []() {
-    Serial.println("Resetting");
+    setStatus("Resetting");
     server.send(200, "text/html", "reset");
     delay(100);
     ESP.restart();
@@ -196,8 +229,66 @@ void setup() {
 
   blastIR();      // Initialize AC to our state
   server.begin();
+
+  ArduinoOTA.setPassword(otaPassword);
+    ArduinoOTA.setHostname(deviceName); // Set the OTA device hostname
+    ArduinoOTA.onStart([]() {
+        String type = (ArduinoOTA.getCommand() == U_FLASH) ? "sketch" : "filesystem";
+        setStatus("Start updating " + type);
+    });
+    ArduinoOTA.onEnd([]() { setStatus("Update Complete"); });
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+        setStatus("Progress: " + String((progress * 100) / total) + "%");
+    });
+    ArduinoOTA.onError([](ota_error_t error) {
+        setStatus("Error: " + String(error));
+        if (error == OTA_AUTH_ERROR)
+            setStatus("Auth Failed");
+        else if (error == OTA_BEGIN_ERROR)
+            setStatus("Begin Failed");
+        else if (error == OTA_CONNECT_ERROR)
+            setStatus("Connect Failed");
+        else if (error == OTA_RECEIVE_ERROR)
+            setStatus("Receive Failed");
+        else if (error == OTA_END_ERROR)
+            setStatus("End Failed");
+    });
+
+    setStatus("Starting OTA server");
+    ArduinoOTA.begin();
+
+    setStatus(WiFi.localIP().toString());
+    delay(2000);
 }
 
 void loop() {
   server.handleClient();
+  ArduinoOTA.handle();
+  if ((WiFi.status() != WL_CONNECTED)) {
+    setStatus("WiFi not connected, reconnecting...");
+    WiFi.reconnect();
+    unsigned long start = millis();
+
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+        delay(100);
+    }
+
+    if (WiFi.status() == WL_CONNECTED) {
+        setStatus("WiFi reconnected");
+    } else {
+        setStatus("Failed to reconnect to WiFi. Retrying...");
+        delay(1000);
+    }
+}
+
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= UPDATEINTERVAL) {
+    previousMillis = currentMillis; // Update the last execution time
+
+    float tmpdistance = distanceSensor.measureDistanceCm();
+    if (tmpdistance > 0) {
+      distance = tmpdistance;
+    }
+  }
 }
