@@ -7,7 +7,6 @@
 #define TRIGGERPIN          D7
 #define ECHOPIN             D8
 
-
 #define DEVICENAME          "AC Remote Control"
 #define OTAPASSWORD         "YOURSECRETHERE"
 

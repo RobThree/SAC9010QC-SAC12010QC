@@ -1,108 +1,93 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#include <ESP8266HTTPUpdateServer.h>
-#include <ESP8266WebServer.h>
-#include <WiFiUdp.h>
-#include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <ArduinoOTA.h>
+#include <ESP8266HTTPUpdateServer.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <HCSR04.h>
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
-#include <HCSR04.h>
+#include <WiFiManager.h>
+#include <WiFiUdp.h>
 #include <config.h>
-
-const uint16_t kIrLed = IRLED;
-const byte triggerPin = TRIGGERPIN;
-const byte echoPin = ECHOPIN;
-
-const char deviceName[] = DEVICENAME;
-const char otaPassword[] = OTAPASSWORD;
-
-const unsigned long portalTimeout = PORTALTIMEOUT;      // seconds
-const unsigned long wifiConnectTimeout = WIFICONNECTTIMEOUT; // seconds
-const uint8_t wifiConnectRetries = WIFICONNECTRETRIES;
 
 float distance = -1;
 unsigned long previousMillis = 0;
 
-IRsend irsend(kIrLed);  // Set the GPIO to be used to sending the message.
+IRsend irsend(IRLED);
 
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdateServer;
-UltraSonicDistanceSensor distanceSensor(triggerPin, echoPin);
+UltraSonicDistanceSensor distanceSensor(TRIGGERPIN, ECHOPIN);
 
-enum acMode { 
-  AUTO = 0, 
-  COOL = 1,
-  DEHUMIDIFY = 2,
-  FAN = 3,
-  HEAT = 4
-};
+enum acMode { AUTO = 0, COOL = 1, DEHUMIDIFY = 2, FAN = 3, HEAT = 4 };
 
 struct state {
-  uint8_t temperature = 20, fanspeed = 0, timer = 0;
-  acMode mode;
-  bool powerOn, swing, sleep, humid, light, ionizer, save;
+    uint8_t temperature = 20, fanspeed = 0, timer = 0;
+    acMode mode;
+    bool powerOn, swing, sleep, humid, light, ionizer, save;
 };
 state acState;
 
 void setStatus(const String &status) {
-  Serial.println(status);
+    // Someday I might add a little OLED display
+    Serial.println(status);
 }
 
 void restart(const String &status) {
-  setStatus(status);
-  delay(3000);
-  ESP.restart();
+    setStatus(status);
+    delay(3000);
+    ESP.restart();
 }
 
-inline const char* acModeToString(acMode mode)
-{
-    switch (mode)
-    {
-        case AUTO:       return "AUTO";
-        case COOL:       return "COOL";
-        case DEHUMIDIFY: return "DEHUMIDIFY";
-        case FAN:        return "FAN";
-        case HEAT:       return "HEAT";
-        default:         return "[Unknown acMode]";
+inline const char *acModeToString(acMode mode) {
+    switch (mode) {
+    case AUTO:
+        return "AUTO";
+    case COOL:
+        return "COOL";
+    case DEHUMIDIFY:
+        return "DEHUMIDIFY";
+    case FAN:
+        return "FAN";
+    case HEAT:
+        return "HEAT";
+    default:
+        return "[Unknown acMode]";
     }
 }
 
-inline const uint64_t getIRCommand()
-{
-  // Initial state
-  uint64_t v = 0b001001010000000000000000000000000000;
+inline const uint64_t getIRCommand() {
+    // Initial state
+    uint64_t v = 0b001001010000000000000000000000000000;
 
-  // Calculate timer value
-  uint8_t timer = 0b00000000;
-  timer |= acState.timer > 0 ? 0b1000 : 0;  // On/off bit
-  timer |= acState.timer % 2 == 0 ? 0 : 1;  // Half hour bit
-  timer |= ((acState.timer / 2) % 10) << 4; // 1s digit
-  timer |= ((acState.timer / 2) / 10) << 1; // 10s digit
+    // Calculate timer value
+    uint8_t timer = 0b00000000;
+    timer |= acState.timer > 0 ? 0b1000 : 0;  // On/off bit
+    timer |= acState.timer % 2 == 0 ? 0 : 1;  // Half hour bit
+    timer |= ((acState.timer / 2) % 10) << 4; // 1s digit
+    timer |= ((acState.timer / 2) / 10) << 1; // 10s digit
 
-  // Calculate the rest of the state
-  v |= acState.mode;
-  v |= acState.powerOn << 3;
-  v |= (acState.fanspeed && 0b11) << 4;
-  v |= acState.swing << 6;
-  v |= acState.sleep << 7;
-  v |= ((acState.temperature - 16) & 0b1111) << 8;
-  v |= timer << 12;
-  v |= acState.humid << 20;
-  v |= acState.light << 21;
-  v |= acState.ionizer << 22;
-  v |= acState.save << 23;
+    // Calculate the rest of the state
+    v |= acState.mode;
+    v |= acState.powerOn << 3;
+    v |= (acState.fanspeed && 0b11) << 4;
+    v |= acState.swing << 6;
+    v |= acState.sleep << 7;
+    v |= ((acState.temperature - 16) & 0b1111) << 8;
+    v |= timer << 12;
+    v |= acState.humid << 20;
+    v |= acState.light << 21;
+    v |= acState.ionizer << 22;
+    v |= acState.save << 23;
 
-  return v;
+    return v;
 }
 
-acMode stringToAcMode(const char* modeStr)
-{
+acMode stringToAcMode(const char *modeStr) {
     acMode modes[] = {AUTO, COOL, DEHUMIDIFY, FAN, HEAT};
 
-    for (uint i = 0; i < sizeof(modes) / sizeof(modes[0]); i++)
-    {
+    for (uint i = 0; i < sizeof(modes) / sizeof(modes[0]); i++) {
         if (strcasecmp(modeStr, acModeToString(modes[i])) == 0)
             return modes[i];
     }
@@ -110,8 +95,7 @@ acMode stringToAcMode(const char* modeStr)
     return AUTO;
 }
 
-String getStateAsJson()
-{
+String getStateAsJson() {
     JsonDocument root;
 
     root["power"] = acState.powerOn;
@@ -124,14 +108,15 @@ String getStateAsJson()
     root["light"] = acState.light;
     root["ionizer"] = acState.ionizer;
     root["save"] = acState.save;
-    root["timer"] = acState.timer;  // Number of 30 minute increments (0 .. 48)
+    root["timer"] = acState.timer; // Number of 30 minute increments (0 .. 48)
     root["distance"] = distance;
     root["rssi"] = WiFi.RSSI();
-    
+
     char lastUpdateStr[32];
-    snprintf(lastUpdateStr, sizeof(lastUpdateStr), "%.2f seconds ago", (millis() - previousMillis) / 1000.0);
+    snprintf(lastUpdateStr, sizeof(lastUpdateStr), "%.2f seconds ago",
+             (millis() - previousMillis) / 1000.0);
     root["lastupdate"] = lastUpdateStr;
-    
+
     String output;
     serializeJson(root, output);
     return output;
@@ -145,93 +130,91 @@ void blastIR() {
 }
 
 void setup() {
-  irsend.begin();
+    irsend.begin();
 
-  Serial.begin(SERIAL_BAUDRATE, SERIAL_8N1, SERIAL_TX_ONLY);
+    Serial.begin(SERIAL_BAUDRATE, SERIAL_8N1, SERIAL_TX_ONLY);
 
-  WiFiManager wifiManager;
-  wifiManager.setConfigPortalTimeout(portalTimeout);
-  wifiManager.setConnectTimeout(wifiConnectTimeout);
-  wifiManager.setConnectRetries(wifiConnectRetries);
-  wifiManager.setWiFiAutoReconnect(true);
-  if (!wifiManager.autoConnect(deviceName)) {
-      restart("Autconnect failed...");
-  }
-
-  httpUpdateServer.setup(&server);
-  server.on("/state", HTTP_PUT, []() {
-    setStatus("PUT /state");
-    JsonDocument root;
-    DeserializationError error = deserializeJson(root, server.arg("plain"));
-    if (error) {
-      server.send(404, "text/plain", "FAIL. " + server.arg("plain"));
-    } else {
-      if (root["power"].is<bool>()) {
-        acState.powerOn = root["power"];
-      }
-      if (root["temperature"].is<int>()) {
-        acState.temperature = constrain((uint8_t)root["temperature"], 16,30);
-      }
-      if (root["fanspeed"].is<int>()) {
-        acState.fanspeed = constrain((uint8_t)root["fanspeed"], 0,3);
-      }
-      if (root["mode"].is<const char*>()) {
-        acState.mode = stringToAcMode(root["mode"]);
-      }
-      if (root["swing"].is<bool>()) {
-        acState.swing = root["swing"];
-      }
-      if (root["sleep"].is<bool>()) {
-        acState.sleep = root["sleep"];
-      }
-      if (root["humid"].is<bool>()) {
-        acState.humid = root["humid"];
-      }
-      if (root["light"].is<bool>()) {
-        acState.light = root["light"];
-      }
-      if (root["ionizer"].is<bool>()) {
-        acState.ionizer = root["ionizer"];
-      }
-      if (root["save"].is<bool>()) {
-        acState.save = root["save"];
-      }
-      if (root["timer"].is<int>()) {
-        acState.timer = constrain(root["timer"], 0, 48);
-      }
-
-      server.send(200, "text/plain", getStateAsJson());
-      blastIR();
+    WiFiManager wifiManager;
+    wifiManager.setConfigPortalTimeout(PORTALTIMEOUT);
+    wifiManager.setConnectTimeout(WIFICONNECTTIMEOUT);
+    wifiManager.setConnectRetries(WIFICONNECTRETRIES);
+    wifiManager.setWiFiAutoReconnect(true);
+    if (!wifiManager.autoConnect(DEVICENAME)) {
+        restart("Autconnect failed...");
     }
-  });
 
-  server.on("/state", HTTP_GET, []() {
-    setStatus("GET /state");
-    server.send(200, "text/plain", getStateAsJson());
-  });
+    httpUpdateServer.setup(&server);
+    server.on("/state", HTTP_PUT, []() {
+        setStatus("PUT /state");
+        JsonDocument root;
+        DeserializationError error = deserializeJson(root, server.arg("plain"));
+        if (error) {
+            server.send(404, "text/plain", "FAIL. " + server.arg("plain"));
+        } else {
+            if (root["power"].is<bool>()) {
+                acState.powerOn = root["power"];
+            }
+            if (root["temperature"].is<int>()) {
+                acState.temperature = constrain((uint8_t)root["temperature"], 16, 30);
+            }
+            if (root["fanspeed"].is<int>()) {
+                acState.fanspeed = constrain((uint8_t)root["fanspeed"], 0, 3);
+            }
+            if (root["mode"].is<const char *>()) {
+                acState.mode = stringToAcMode(root["mode"]);
+            }
+            if (root["swing"].is<bool>()) {
+                acState.swing = root["swing"];
+            }
+            if (root["sleep"].is<bool>()) {
+                acState.sleep = root["sleep"];
+            }
+            if (root["humid"].is<bool>()) {
+                acState.humid = root["humid"];
+            }
+            if (root["light"].is<bool>()) {
+                acState.light = root["light"];
+            }
+            if (root["ionizer"].is<bool>()) {
+                acState.ionizer = root["ionizer"];
+            }
+            if (root["save"].is<bool>()) {
+                acState.save = root["save"];
+            }
+            if (root["timer"].is<int>()) {
+                acState.timer = constrain(root["timer"], 0, 48);
+            }
 
-  server.on("/mac", HTTP_GET, []() {
-    setStatus("GET /mac");
-    
-    server.send(200, "text/plain", WiFi.macAddress());
-  });
+            server.send(200, "text/plain", getStateAsJson());
+            blastIR();
+        }
+    });
 
-  server.on("/reset", HTTP_PUT, []() {
-    setStatus("Resetting");
-    server.send(200, "text/html", "reset");
-    delay(100);
-    ESP.restart();
-  });
+    server.on("/state", HTTP_GET, []() {
+        setStatus("GET /state");
+        server.send(200, "text/plain", getStateAsJson());
+    });
 
-  server.onNotFound([]() {
-    server.send(404, "text/plain", "File not found");
-  });
+    server.on("/mac", HTTP_GET, []() {
+        setStatus("GET /mac");
 
-  blastIR();      // Initialize AC to our state
-  server.begin();
+        server.send(200, "text/plain", WiFi.macAddress());
+    });
 
-  ArduinoOTA.setPassword(otaPassword);
-    ArduinoOTA.setHostname(deviceName); // Set the OTA device hostname
+    server.on("/reset", HTTP_PUT, []() {
+        setStatus("Resetting");
+        server.send(200, "text/html", "reset");
+        delay(100);
+        ESP.restart();
+    });
+
+    server.onNotFound([]() { server.send(404, "text/plain", "File not found"); });
+
+    blastIR(); // Initialize AC to our state
+    server.begin();
+
+    ArduinoOTA.setPassword(OTAPASSWORD);
+    ArduinoOTA.setHostname(DEVICENAME); // Set the OTA device hostname
     ArduinoOTA.onStart([]() {
         String type = (ArduinoOTA.getCommand() == U_FLASH) ? "sketch" : "filesystem";
         setStatus("Start updating " + type);
@@ -262,33 +245,33 @@ void setup() {
 }
 
 void loop() {
-  server.handleClient();
-  ArduinoOTA.handle();
-  if ((WiFi.status() != WL_CONNECTED)) {
-    setStatus("WiFi not connected, reconnecting...");
-    WiFi.reconnect();
-    unsigned long start = millis();
+    server.handleClient();
+    ArduinoOTA.handle();
+    if ((WiFi.status() != WL_CONNECTED)) {
+        setStatus("WiFi not connected, reconnecting...");
+        WiFi.reconnect();
+        unsigned long start = millis();
 
-    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
-        delay(100);
+        while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+            delay(100);
+        }
+
+        if (WiFi.status() == WL_CONNECTED) {
+            setStatus("WiFi reconnected");
+        } else {
+            setStatus("Failed to reconnect to WiFi. Retrying...");
+            delay(1000);
+        }
     }
 
-    if (WiFi.status() == WL_CONNECTED) {
-        setStatus("WiFi reconnected");
-    } else {
-        setStatus("Failed to reconnect to WiFi. Retrying...");
-        delay(1000);
+    unsigned long currentMillis = millis();
+
+    if (currentMillis - previousMillis >= UPDATEINTERVAL) {
+        previousMillis = currentMillis; // Update the last execution time
+
+        float tmpdistance = distanceSensor.measureDistanceCm();
+        if (tmpdistance > 0) {
+            distance = tmpdistance;
+        }
     }
-}
-
-  unsigned long currentMillis = millis();
-
-  if (currentMillis - previousMillis >= UPDATEINTERVAL) {
-    previousMillis = currentMillis; // Update the last execution time
-
-    float tmpdistance = distanceSensor.measureDistanceCm();
-    if (tmpdistance > 0) {
-      distance = tmpdistance;
-    }
-  }
 }
