@@ -108,6 +108,15 @@
             text-align: center;
             margin: 0 10px;
         }
+        .refresh-button {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 15px;
+        }
         .submit-button {
             background: #2196F3;
             color: white;
@@ -201,6 +210,7 @@
             </div>
             
             <button id="submitBtn" class="submit-button">Apply Settings</button>
+            <button id="refreshBtn" class="refresh-button">Read Settings</button>
             
             <div id="statusMsg" class="status hidden"></div>
         </div>
@@ -242,6 +252,7 @@
         const timerUp = document.getElementById('timerUp');
         const timerDown = document.getElementById('timerDown');
         const submitBtn = document.getElementById('submitBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
         const statusMsg = document.getElementById('statusMsg');
         const controlsContainer = document.getElementById('controlsContainer');
         
@@ -291,10 +302,10 @@
                 }
                 acState = await response.json();
                 updateUI();
-                showStatus('Connected to AC unit', 'success');
+                showStatus('Connected to AC controller', 'success');
             } catch (error) {
                 console.error('Error fetching AC state:', error);
-                showStatus('Failed to connect to AC unit', 'error');
+                showStatus('Failed to connect to AC controller', 'error');
             }
         }
         
@@ -404,6 +415,7 @@
         });
         
         submitBtn.addEventListener('click', sendACState);
+        refreshBtn.addEventListener('click', fetchACState);
         
         // Initialize the app
         document.addEventListener('DOMContentLoaded', fetchACState);
