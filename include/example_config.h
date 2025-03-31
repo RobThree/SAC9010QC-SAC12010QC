@@ -9,7 +9,7 @@
 
 
 #define DEVICENAME          "AC Remote Control"
-#define OTAPASSWORD         "YOUSECRETHERE"
+#define OTAPASSWORD         "YOURSECRETHERE"
 
 #define PORTALTIMEOUT       90
 #define WIFICONNECTTIMEOUT  10
