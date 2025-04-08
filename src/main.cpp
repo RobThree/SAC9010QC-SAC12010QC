@@ -130,6 +130,17 @@ void blastIR() {
     irsend.sendTeco(irCommand, 36);
 }
 
+void serveFile(const char *path, const char *contentType = "text/html", int cacheTTL = 300) {
+  File file = LittleFS.open(path, "r");
+  if (!file) {
+      server.send(404, "text/plain", "File not found");
+      return;
+  }
+  server.sendHeader("Cache-Control", "max-age=" + String(cacheTTL));
+  server.streamFile(file, contentType);
+  file.close();
+}
+
 void setup() {
     irsend.begin();
 
@@ -209,15 +220,10 @@ void setup() {
         ESP.restart();
     });
 
-    server.on("/", HTTP_GET, []() {
-        File file = LittleFS.open("/index.html", "r");
-        if (!file) {
-            server.send(404, "text/plain", "File not found");
-            return;
-        }
-        server.streamFile(file, "text/html");
-        file.close();
-    });
+    server.on("/", HTTP_GET, []() { serveFile("/index.html"); });
+    server.on("/css", HTTP_GET, []() { serveFile("/main.css", "text/css"); });
+    server.on("/js", HTTP_GET, []() { serveFile("/app.js", "text/javascript"); });
+    server.on("/favicon.ico", HTTP_GET, []() { serveFile("/favicon.svg", "image/svg+xml", 60 * 60 * 24); });
 
     server.onNotFound([]() { server.send(404, "text/plain", "File not found"); });
 
