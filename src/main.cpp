@@ -28,6 +28,10 @@ void setup() {
     server.serveStatic("/css", "/main.css");
     server.serveStatic("/js", "/app.js");
     server.serveStatic("/favicon.ico", "/favicon.svg");
+    server.serveStatic("/manifest.json", "/manifest.json");
+    server.serveStatic("/ati120.png", "/ati120.png");
+    server.serveStatic("/ati152.png", "/ati152.png");
+    server.serveStatic("/ati180.png", "/ati180.png");
     server.on("/state", HTTP_GET, handleReading);
     server.on("/state", HTTP_PUT, handleApply);
     server.useDefaultEndpoints();

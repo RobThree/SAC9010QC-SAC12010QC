@@ -1,0 +1,25 @@
+{
+  "name": "AC Control",
+  "short_name": "AC Control",
+  "start_url": "http://ac-masterbedroom.devcorner.nl/",
+  "icons": [
+    {
+      "src": "/ati180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/ati152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/ati120.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }
+  ],
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone"
+}

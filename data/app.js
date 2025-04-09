@@ -2,19 +2,7 @@
 const API_ENDPOINT = '/state';
 
 // AC state
-let acState = {
-    power: false,
-    temperature: 20,
-    fanspeed: 0,
-    mode: 'COOL',
-    swing: false,
-    sleep: false,
-    humid: false,
-    light: false,
-    ionizer: false,
-    save: false,
-    timer: 0,
-};
+let acState = {};
 
 // DOM elements
 const powerBtn = document.getElementById('powerBtn');
