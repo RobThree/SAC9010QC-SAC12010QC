@@ -1,4 +1,4 @@
-# Reverse engineered `SAC9010QC` / `SAC12010QC` IR protocol
+# ![Logo](data/favicon.svg) Reverse engineered `SAC9010QC` / `SAC12010QC` IR protocol
 Reverse engineered IR protocol for HomeFit Living / Alaska `SAC9010QC` / `SAC12010QC` remote control based on an `NEC 756504012` IC. It is [apparently](https://aliexpress.com/wholesale?SearchText=Gree+Y512) also known as the "`Gree Y502 / Y512`" remote and the silkscreen on the PCB states "`Gree 5I2`".
 
 If you want to go straight to the juicy parts, go checkout [protocol.md](protocol.md).
@@ -57,3 +57,9 @@ In the [circuit](circuit) directory you can find a circuit for a Wemos D1 Mini. 
 * Optionally some wire / perfboard to mount the components (but you can [deadbug](https://en.wikipedia.org/wiki/Point-to-point_construction#%22Dead_bug%22_construction) the circuit like [this](circuit/wemos2.jpg))
 
 Build the circuit, flash the Wemos D1 module and you're done.
+
+---
+
+## Attribution
+
+Icon by [Wishforge.games](https://www.wishforge.games/?ref=svgrepo.com) at [SVG Repo](https://www.svgrepo.com/svg/390814/winter-snow-flake-cold-season-christmas)

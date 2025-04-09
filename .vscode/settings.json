@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.module": "php",
+        "*.php": "php",
+        "cmath": "cpp"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    }
+}

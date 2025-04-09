@@ -1,424 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC Control Panel</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .control-panel {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-        .power-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #f0f0f0;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            font-size: 24px;
-        }
-        .power-button.on {
-            background: #4CAF50;
-            color: white;
-        }
-        .temperature-control {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .temp-display {
-            font-size: 48px;
-            font-weight: bold;
-            text-align: center;
-            width: 100px;
-        }
-        .temp-buttons {
-            display: flex;
-            flex-direction: column;
-        }
-        .temp-button {
-            padding: 10px 15px;
-            margin: 5px;
-            border: none;
-            background: #e0e0e0;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        .control-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: block;
-        }
-        select, input {
-            padding: 8px 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            width: 100%;
-        }
-        .toggle-button {
-            background: #e0e0e0;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .toggle-button.active {
-            background: #2196F3;
-            color: white;
-        }
-        .timer-control {
-            display: flex;
-            align-items: center;
-        }
-        .timer-value {
-            width: 60px;
-            text-align: center;
-            margin: 0 10px;
-        }
-        .refresh-button {
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-        .submit-button {
-            background: #2196F3;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .success {
-            background: #E8F5E9;
-            color: #2E7D32;
-        }
-        .error {
-            background: #FFEBEE;
-            color: #C62828;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="control-panel">
-        <div class="header">
-            <h1>AC Control Panel</h1>
-            <button id="powerBtn" class="power-button">⏻</button>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AC Control Panel</title>
+        <link rel="stylesheet" href="/css" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    </head>
+    <body>
+        <div id="loadingOverlay" class="overlay">
+            <div class="spinner"></div>
         </div>
-        
-        <div id="controlsContainer">
-            <div class="temperature-control">
-                <button id="tempDown" class="temp-button">-</button>
-                <div class="temp-display">
-                    <span id="tempValue">20</span>°C
-                </div>
-                <button id="tempUp" class="temp-button">+</button>
-            </div>
-            
-            <div class="control-row">
-                <div class="control-group">
-                    <div class="control-label">Mode</div>
-                    <select id="modeSelect">
-                        <option value="AUTO">Auto</option>
-                        <option value="COOL" selected>Cool</option>
-                        <option value="HEAT">Heat</option>
-                        <option value="DEHUMIDIFY">Dehumidify</option>
-                        <option value="FAN">Fan</option>
-                    </select>
-                </div>
-                
-                <div class="control-group">
-                    <div class="control-label">Fan Speed</div>
-                    <select id="fanSpeedSelect">
-                        <option value="0" selected>Auto</option>
-                        <option value="1">Low</option>
-                        <option value="2">Medium</option>
-                        <option value="3">High</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <div class="control-label">Features</div>
-                <div class="control-row">
-                    <button id="swingBtn" class="toggle-button">Swing</button>
-                    <button id="sleepBtn" class="toggle-button">Sleep</button>
-                    <button id="humidBtn" class="toggle-button">Humid</button>
-                </div>
-                <div class="control-row" style="margin-top: 10px;">
-                    <button id="lightBtn" class="toggle-button">Light</button>
-                    <button id="ionizerBtn" class="toggle-button">Ionizer</button>
-                    <button id="saveBtn" class="toggle-button">Eco</button>
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <div class="control-label">Timer</div>
-                <div class="timer-control">
-                    <button id="timerDown" class="temp-button">-</button>
-                    <div class="timer-value" id="timerHours">0 hr</div>
-                    <button id="timerUp" class="temp-button">+</button>
-                </div>
-            </div>
-            
-            <button id="submitBtn" class="submit-button">Apply Settings</button>
-            <button id="refreshBtn" class="refresh-button">Read Settings</button>
-            
-            <div id="statusMsg" class="status hidden"></div>
-        </div>
-    </div>
 
-    <script>
-        // Configuration
-        const API_ENDPOINT = '/state';
-        
-        // AC state
-        let acState = {
-            power: false,
-            temperature: 20,
-            fanspeed: 0,
-            mode: "COOL",
-            swing: false,
-            sleep: false,
-            humid: false,
-            light: false,
-            ionizer: false,
-            save: false,
-            timer: 0
-        };
-        
-        // DOM elements
-        const powerBtn = document.getElementById('powerBtn');
-        const tempValue = document.getElementById('tempValue');
-        const tempUp = document.getElementById('tempUp');
-        const tempDown = document.getElementById('tempDown');
-        const modeSelect = document.getElementById('modeSelect');
-        const fanSpeedSelect = document.getElementById('fanSpeedSelect');
-        const swingBtn = document.getElementById('swingBtn');
-        const sleepBtn = document.getElementById('sleepBtn');
-        const humidBtn = document.getElementById('humidBtn');
-        const lightBtn = document.getElementById('lightBtn');
-        const ionizerBtn = document.getElementById('ionizerBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const timerHours = document.getElementById('timerHours');
-        const timerUp = document.getElementById('timerUp');
-        const timerDown = document.getElementById('timerDown');
-        const submitBtn = document.getElementById('submitBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const statusMsg = document.getElementById('statusMsg');
-        const controlsContainer = document.getElementById('controlsContainer');
-        
-        // Function to update UI based on current state
-        function updateUI() {
-            // Power button
-            if (acState.power) {
-                powerBtn.classList.add('on');
-            } else {
-                powerBtn.classList.remove('on');
-            }
-            
-            // Temperature
-            tempValue.textContent = acState.temperature;
-            
-            // Mode and Fan Speed
-            modeSelect.value = acState.mode;
-            fanSpeedSelect.value = acState.fanspeed.toString();
-            
-            // Toggle buttons
-            updateToggleButton(swingBtn, acState.swing);
-            updateToggleButton(sleepBtn, acState.sleep);
-            updateToggleButton(humidBtn, acState.humid);
-            updateToggleButton(lightBtn, acState.light);
-            updateToggleButton(ionizerBtn, acState.ionizer);
-            updateToggleButton(saveBtn, acState.save);
-            
-            // Timer
-            const hours = acState.timer * 0.5;
-            timerHours.textContent = hours + (hours === 1 ? ' hr' : ' hrs');
-        }
-        
-        function updateToggleButton(button, isActive) {
-            if (isActive) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        }
-        
-        // Function to fetch current AC state
-        async function fetchACState() {
-            try {
-                const response = await fetch(API_ENDPOINT);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                acState = await response.json();
-                updateUI();
-                showStatus('Connected to AC controller', 'success');
-            } catch (error) {
-                console.error('Error fetching AC state:', error);
-                showStatus('Failed to connect to AC controller', 'error');
-            }
-        }
-        
-        // Function to send updated AC state
-        async function sendACState() {
-            try {
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(acState)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                showStatus('Settings applied successfully', 'success');
-            } catch (error) {
-                console.error('Error updating AC state:', error);
-                showStatus('Failed to apply settings', 'error');
-            }
-        }
-        
-        // Function to show status messages
-        function showStatus(message, type) {
-            statusMsg.textContent = message;
-            statusMsg.className = 'status ' + type;
-            statusMsg.classList.remove('hidden');
-            
-            setTimeout(() => {
-                statusMsg.classList.add('hidden');
-            }, 3000);
-        }
-        
-        // Event Listeners
-        powerBtn.addEventListener('click', () => {
-            acState.power = !acState.power;
-            updateUI();
-        });
-        
-        tempUp.addEventListener('click', () => {
-            if (acState.temperature < 30) {
-                acState.temperature++;
-                updateUI();
-            }
-        });
-        
-        tempDown.addEventListener('click', () => {
-            if (acState.temperature > 16) {
-                acState.temperature--;
-                updateUI();
-            }
-        });
-        
-        modeSelect.addEventListener('change', (e) => {
-            acState.mode = e.target.value;
-        });
-        
-        fanSpeedSelect.addEventListener('change', (e) => {
-            acState.fanspeed = parseInt(e.target.value);
-        });
-        
-        swingBtn.addEventListener('click', () => {
-            acState.swing = !acState.swing;
-            updateUI();
-        });
-        
-        sleepBtn.addEventListener('click', () => {
-            acState.sleep = !acState.sleep;
-            updateUI();
-        });
-        
-        humidBtn.addEventListener('click', () => {
-            acState.humid = !acState.humid;
-            updateUI();
-        });
-        
-        lightBtn.addEventListener('click', () => {
-            acState.light = !acState.light;
-            updateUI();
-        });
-        
-        ionizerBtn.addEventListener('click', () => {
-            acState.ionizer = !acState.ionizer;
-            updateUI();
-        });
-        
-        saveBtn.addEventListener('click', () => {
-            acState.save = !acState.save;
-            updateUI();
-        });
-        
-        timerUp.addEventListener('click', () => {
-            if (acState.timer < 48) {
-                acState.timer++;
-                updateUI();
-            }
-        });
-        
-        timerDown.addEventListener('click', () => {
-            if (acState.timer > 0) {
-                acState.timer--;
-                updateUI();
-            }
-        });
-        
-        submitBtn.addEventListener('click', sendACState);
-        refreshBtn.addEventListener('click', fetchACState);
-        
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', fetchACState);
-    </script>
-</body>
+        <div class="control-panel">
+            <div class="header">
+                <h1>AC Control Panel</h1>
+                <button id="powerBtn" class="power-button">⏻</button>
+            </div>
+
+            <div id="controlsContainer">
+                <div class="temperature-control">
+                    <button id="tempDown" class="temp-button">-</button>
+                    <div class="temp-display"><span id="tempValue">20</span>°C</div>
+                    <button id="tempUp" class="temp-button">+</button>
+                </div>
+
+                <div class="control-row">
+                    <div class="control-group">
+                        <div class="control-label">Mode</div>
+                        <select id="modeSelect">
+                            <option value="AUTO">Auto</option>
+                            <option value="COOL" selected>Cool</option>
+                            <option value="HEAT">Heat</option>
+                            <option value="DEHUMIDIFY">Dehumidify</option>
+                            <option value="FAN">Fan</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">Fan Speed</div>
+                        <select id="fanSpeedSelect">
+                            <option value="0" selected>Auto</option>
+                            <option value="1">Low</option>
+                            <option value="2">Medium</option>
+                            <option value="3">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">Features</div>
+                    <div class="control-row">
+                        <button id="swingBtn" class="toggle-button">Swing</button>
+                        <button id="sleepBtn" class="toggle-button">Sleep</button>
+                        <button id="humidBtn" class="toggle-button">Humid</button>
+                    </div>
+                    <div class="control-row">
+                        <button id="lightBtn" class="toggle-button">Light</button>
+                        <button id="ionizerBtn" class="toggle-button">Ionizer</button>
+                        <button id="saveBtn" class="toggle-button">Eco</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">Timer</div>
+                    <div class="timer-control">
+                        <button id="timerDown" class="temp-button">-</button>
+                        <div class="timer-value" id="timerHours">0 hr</div>
+                        <button id="timerUp" class="temp-button">+</button>
+                    </div>
+                </div>
+
+                <button id="submitBtn" class="submit-button">Apply Settings</button>
+                <button id="refreshBtn" class="refresh-button">Read Settings</button>
+
+                <div id="statusMsg" class="status hidden"></div>
+            </div>
+        </div>
+
+        <script defer src="/js"></script>
+    </body>
 </html>
