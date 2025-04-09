@@ -76,13 +76,17 @@ function updateToggleButton(button, isActive) {
 
 // Function to fetch current AC state
 async function fetchACState() {
+  const overlay = document.getElementById("loadingOverlay");
+
   try {
     const response = await fetch(API_ENDPOINT);
+    overlay.classList.remove("hidden");
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     acState = await response.json();
     updateUI();
+    overlay.classList.add("hidden");
     showStatus("Connected to AC controller", "success");
   } catch (error) {
     console.error("Error fetching AC state:", error);

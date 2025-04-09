@@ -1,81 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AC Control Panel</title>
-    <link rel="stylesheet" href="/css">
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico">
-</head>
-<body>
+    <link rel="stylesheet" href="/css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  </head>
+  <body>
+    <div id="loadingOverlay" class="overlay">
+      <div class="spinner"></div>
+    </div>
+
     <div class="control-panel">
-        <div class="header">
-            <h1>AC Control Panel</h1>
-            <button id="powerBtn" class="power-button">⏻</button>
+      <div class="header">
+        <h1>AC Control Panel</h1>
+        <button id="powerBtn" class="power-button">⏻</button>
+      </div>
+
+      <div id="controlsContainer">
+        <div class="temperature-control">
+          <button id="tempDown" class="temp-button">-</button>
+          <div class="temp-display"><span id="tempValue">20</span>°C</div>
+          <button id="tempUp" class="temp-button">+</button>
         </div>
-        
-        <div id="controlsContainer">
-            <div class="temperature-control">
-                <button id="tempDown" class="temp-button">-</button>
-                <div class="temp-display">
-                    <span id="tempValue">20</span>°C
-                </div>
-                <button id="tempUp" class="temp-button">+</button>
-            </div>
-            
-            <div class="control-row">
-                <div class="control-group">
-                    <div class="control-label">Mode</div>
-                    <select id="modeSelect">
-                        <option value="AUTO">Auto</option>
-                        <option value="COOL" selected>Cool</option>
-                        <option value="HEAT">Heat</option>
-                        <option value="DEHUMIDIFY">Dehumidify</option>
-                        <option value="FAN">Fan</option>
-                    </select>
-                </div>
-                
-                <div class="control-group">
-                    <div class="control-label">Fan Speed</div>
-                    <select id="fanSpeedSelect">
-                        <option value="0" selected>Auto</option>
-                        <option value="1">Low</option>
-                        <option value="2">Medium</option>
-                        <option value="3">High</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <div class="control-label">Features</div>
-                <div class="control-row">
-                    <button id="swingBtn" class="toggle-button">Swing</button>
-                    <button id="sleepBtn" class="toggle-button">Sleep</button>
-                    <button id="humidBtn" class="toggle-button">Humid</button>
-                </div>
-                <div class="control-row" style="margin-top: 10px;">
-                    <button id="lightBtn" class="toggle-button">Light</button>
-                    <button id="ionizerBtn" class="toggle-button">Ionizer</button>
-                    <button id="saveBtn" class="toggle-button">Eco</button>
-                </div>
-            </div>
-            
-            <div class="control-group">
-                <div class="control-label">Timer</div>
-                <div class="timer-control">
-                    <button id="timerDown" class="temp-button">-</button>
-                    <div class="timer-value" id="timerHours">0 hr</div>
-                    <button id="timerUp" class="temp-button">+</button>
-                </div>
-            </div>
-            
-            <button id="submitBtn" class="submit-button">Apply Settings</button>
-            <button id="refreshBtn" class="refresh-button">Read Settings</button>
-            
-            <div id="statusMsg" class="status hidden"></div>
+
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Mode</div>
+            <select id="modeSelect">
+              <option value="AUTO">Auto</option>
+              <option value="COOL" selected>Cool</option>
+              <option value="HEAT">Heat</option>
+              <option value="DEHUMIDIFY">Dehumidify</option>
+              <option value="FAN">Fan</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">Fan Speed</div>
+            <select id="fanSpeedSelect">
+              <option value="0" selected>Auto</option>
+              <option value="1">Low</option>
+              <option value="2">Medium</option>
+              <option value="3">High</option>
+            </select>
+          </div>
         </div>
+
+        <div class="control-group">
+          <div class="control-label">Features</div>
+          <div class="control-row">
+            <button id="swingBtn" class="toggle-button">Swing</button>
+            <button id="sleepBtn" class="toggle-button">Sleep</button>
+            <button id="humidBtn" class="toggle-button">Humid</button>
+          </div>
+          <div class="control-row" style="margin-top: 10px">
+            <button id="lightBtn" class="toggle-button">Light</button>
+            <button id="ionizerBtn" class="toggle-button">Ionizer</button>
+            <button id="saveBtn" class="toggle-button">Eco</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">Timer</div>
+          <div class="timer-control">
+            <button id="timerDown" class="temp-button">-</button>
+            <div class="timer-value" id="timerHours">0 hr</div>
+            <button id="timerUp" class="temp-button">+</button>
+          </div>
+        </div>
+
+        <button id="submitBtn" class="submit-button">Apply Settings</button>
+        <button id="refreshBtn" class="refresh-button">Read Settings</button>
+
+        <div id="statusMsg" class="status hidden"></div>
+      </div>
     </div>
 
     <script defer src="/js"></script>
-</body>
+  </body>
 </html>
