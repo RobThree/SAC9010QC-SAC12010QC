@@ -1,25 +1,30 @@
 # ![Logo](data/favicon.svg) Reverse engineered `SAC9010QC` / `SAC12010QC` IR protocol
+
 Reverse engineered IR protocol for HomeFit Living / Alaska `SAC9010QC` / `SAC12010QC` remote control based on an `NEC 756504012` IC. It is [apparently](https://aliexpress.com/wholesale?SearchText=Gree+Y512) also known as the "`Gree Y502 / Y512`" remote and the silkscreen on the PCB states "`Gree 5I2`".
 
 If you want to go straight to the juicy parts, go checkout [protocol.md](protocol.md).
 
 The [documentation](documentation) directory contains the `SAC9010QC` / `SAC12010QC` manual and other resources used. The [pics](pics) directory contains some photos of the remote control, it's PCB and my test setup. [dumps](dumps) contains a few [PulseView](https://sigrok.org/wiki/PulseView) dumps of the IR signal as captured by my [DSLogic Plus](https://aliexpress.com/item/33023055743.html).
 
-Finally, [src](src) contains a simple webserver that can be used to control the AC unit by using a REST protocol. It uses the WiFiManager for initial WiFi setup (connect to it's accesspoint, enter your WiFi SSID and password) and after that you can go to it's IP and do a `GET` on `/state` to get the current state (as managed by the ESP, not the *actual* state of the AC unit, since that cannot be read). The response will look like:
+Finally, [src](src) contains a simple webserver that can be used to control the AC unit by using a REST protocol. It uses the WiFiManager for initial WiFi setup (connect to it's accesspoint, enter your WiFi SSID and password) and after that you can go to it's IP and do a `GET` on `/state` to get the current state (as managed by the ESP, not the _actual_ state of the AC unit, since that cannot be read). The response will look like:
 
 ```json
 {
-	"power": false,
-	"temperature": 20,
-	"fanspeed": 0,
-	"mode": "COOL",
-	"swing": false,
-	"sleep": false,
-	"humid": false,
-	"light": false,
-	"ionizer": false,
-	"save": false,
-	"timer": 0
+    "power": false,
+    "temperature": 20,
+    "fanspeed": 0,
+    "mode": "COOL",
+    "swing": false,
+    "sleep": false,
+    "humid": false,
+    "light": false,
+    "ionizer": false,
+    "save": false,
+    "timer": 0,
+    "rssi": -62,
+    "lastupdate": "0.95 seconds ago",
+    "lastupdate_ms": 950,
+    "devicename": "AC Remote Control"
 }
 ```
 
@@ -49,12 +54,12 @@ These are cheap and work great for this application and require no soldering. Yo
 
 In the [circuit](circuit) directory you can find a circuit for a Wemos D1 Mini. You'll need:
 
-* 1 resistor 100Ω
-* 1 resistor 680Ω
-* 1 2N3904 NPN BJT
-* 1 IR LED
-* A bit of solder and a soldering iron (and soldering skills)
-* Optionally some wire / perfboard to mount the components (but you can [deadbug](https://en.wikipedia.org/wiki/Point-to-point_construction#%22Dead_bug%22_construction) the circuit like [this](circuit/wemos2.jpg))
+-   1 resistor 100Ω
+-   1 resistor 680Ω
+-   1 2N3904 NPN BJT
+-   1 IR LED
+-   A bit of solder and a soldering iron (and soldering skills)
+-   Optionally some wire / perfboard to mount the components (but you can [deadbug](https://en.wikipedia.org/wiki/Point-to-point_construction#%22Dead_bug%22_construction) the circuit like [this](circuit/wemos2.jpg))
 
 Build the circuit, flash the Wemos D1 module and you're done.
 
