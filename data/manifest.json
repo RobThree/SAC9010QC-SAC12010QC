@@ -1,7 +1,7 @@
 {
   "name": "AC Control",
   "short_name": "AC Control",
-  "start_url": "http://ac-masterbedroom.devcorner.nl/",
+  "start_url": "/",
   "icons": [
     {
       "src": "/ati180.png",
