@@ -22,6 +22,8 @@ Finally, [src](src) contains a simple webserver that can be used to control the 
     "save": false,
     "timer": 0,
     "rssi": -62,
+    "lastupdate": "0.95 seconds ago",
+    "lastupdate_ms": 950,
     "devicename": "AC Remote Control"
 }
 ```
