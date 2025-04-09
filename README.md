@@ -61,6 +61,14 @@ In the [circuit](circuit) directory you can find a circuit for a Wemos D1 Mini. 
 
 Build the circuit, flash the Wemos D1 module and you're done.
 
+## Web interface
+
+This project offers a web UI. We already mentioned the `/state` [`GET`] REST endpoint but when you go to http://<deviceip>/ you will be greeted with this:
+
+![Screenshot](pics/screenshot.png)
+
+This makes your remote totally redundant. Other endpoints of interest are `/mac` [`GET`] (returns the MAC-address of the device) and `/reset` [`PUT`] (reboots the device). Keep in mind that there is no such thing as 'two way communication', there is _no_ way to get the actual state of the AC. So this 'controller' keeps a state and whenever changes are applied, _all_ values are sent to the AC to ensure all values are applied. However, when you change the AC with your remote then this controller has no way of knowing what values, if any, changed or what the current values are. It will still 'think' the AC is in the state it last sent to the AC. But you'll be happy to know that this 'web app' can be added to your phone's homescreen and you can put your remote in a drawer (tip: remove batteries first!). The "Read settings" does nothing more than retrieve the AC state from the controller (what _it 'thinks'_ state the AC is in) and sync the UI with those values.
+
 ---
 
 ## Attribution
