@@ -8,7 +8,7 @@ enum ACMode { AUTO = 0, COOL = 1, DEHUMIDIFY = 2, FAN = 3, HEAT = 4 };
 struct ACState {
     uint8_t temperature = 20, fanspeed = 0, timer = 0;
     ACMode mode = AUTO;
-    bool powerOn, swing, sleep, humid, light, ionizer, save = false;
+    bool powerOn = false, swing = false, sleep = false, humid = false, light = false, ionizer = false, save = false;
 
     inline const uint64_t getIRCommand() {
         // Initial state
