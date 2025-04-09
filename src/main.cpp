@@ -4,14 +4,22 @@
 #include "webserver.h"
 #include <ArduinoJson.h>
 #include <config.h>
+#ifdef MYHOME
+#include "sensor.h"
+#endif
 
 Logger logger(Serial);
 OTA ota(logger);
 SimpleWiFi wifi(logger);
 Webserver server(logger, LittleFS, HTTP_PORT);
 IR ir(logger, IRLED);
-
 ACState acState;
+
+#ifdef MYHOME
+Sensor sensor(logger, TRIGGERPIN, ECHOPIN);
+unsigned long previousMillis = 0;
+float lastdistance = -1;
+#endif
 
 void handleReading();
 void handleApply();
@@ -48,6 +56,19 @@ void loop() {
     server.handleClient();
     ota.handle();
     wifi.ensureConnected();
+
+#ifdef MYHOME
+    unsigned long currentMillis = millis(); // Get the current time
+
+    if (currentMillis - previousMillis >= UPDATEINTERVAL) {
+        previousMillis = currentMillis; // Update the last execution time
+
+        float tmpdistance = sensor.readDistance();
+        if (tmpdistance > 0) {
+            lastdistance = tmpdistance;
+        }
+    }
+#endif
 }
 
 void handleReading() { server.sendJson(getStateAsJson()); }
@@ -112,6 +133,16 @@ JsonDocument getStateAsJson() {
     root["save"] = acState.save;
     root["timer"] = acState.timer; // Number of 30 minute increments (0 .. 48)
     root["rssi"] = WiFi.RSSI();
+
+#ifdef MYHOME
+    char lastUpdateStr[32];
+    unsigned long lastupdate = millis() - previousMillis;
+    snprintf(lastUpdateStr, sizeof(lastUpdateStr), "%.2f seconds ago", lastupdate / 1000.0);
+    root["lastupdate"] = lastUpdateStr;
+    root["lastupdate_ms"] = lastupdate;
+    root["distance"] = lastdistance;
+#endif
+
     root["devicename"] = DEVICENAME;
 
     return root;
