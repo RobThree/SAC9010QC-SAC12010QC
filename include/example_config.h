@@ -10,6 +10,7 @@
 #ifdef MYHOME
 #define TRIGGERPIN D7
 #define ECHOPIN D8
+#define DOORCLOSEDTHRESHOLD 10 // cm
 #endif
 #define IRLED D2
 

@@ -141,6 +141,7 @@ JsonDocument getStateAsJson() {
     root["lastupdate"] = lastUpdateStr;
     root["lastupdate_ms"] = lastupdate;
     root["distance"] = lastdistance;
+    root["doorclosed"] = lastdistance < DOORCLOSEDTHRESHOLD;
 #endif
 
     root["devicename"] = DEVICENAME;
