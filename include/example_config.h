@@ -12,7 +12,6 @@
 #define ECHOPIN D8
 #define DOORCLOSEDTHRESHOLD 10 // cm
 #endif
-#define IRLED D2
 
 #define DEVICENAME "AC Remote Control"
 #define OTAPASSWORD "YOURSECRETHERE"

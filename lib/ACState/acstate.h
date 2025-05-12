@@ -15,20 +15,20 @@ struct ACState {
         uint64_t v = 0b001001010000000000000000000000000000;
 
         // Calculate timer value
-        uint8_t timer = 0b00000000;
-        timer |= timer > 0 ? 0b1000 : 0;  // On/off bit
-        timer |= timer % 2 == 0 ? 0 : 1;  // Half hour bit
-        timer |= ((timer / 2) % 10) << 4; // 1s digit
-        timer |= ((timer / 2) / 10) << 1; // 10s digit
+        uint8_t t = 0b00000000;
+        t |= timer > 0 ? 0b1000 : 0;  // On/off bit
+        t |= timer % 2 == 0 ? 0 : 1;  // Half hour bit
+        t |= ((timer / 2) % 10) << 4; // 1s digit
+        t |= ((timer / 2) / 10) << 1; // 10s digit
 
         // Calculate the rest of the state
         v |= mode;
         v |= powerOn << 3;
-        v |= (fanspeed && 0b11) << 4;
+        v |= (fanspeed & 0b11) << 4;
         v |= swing << 6;
         v |= sleep << 7;
         v |= ((temperature - 16) & 0b1111) << 8;
-        v |= timer << 12;
+        v |= t << 12;
         v |= humid << 20;
         v |= light << 21;
         v |= ionizer << 22;
